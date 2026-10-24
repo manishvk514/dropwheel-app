@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DropWheel</title>
+<meta name="description" content="DropWheel for Mac: drag any file, tap a key, drop on a petal. Free, private, works offline.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<meta property="og:title" content="DropWheel for Mac">
+<meta property="og:description" content="Drag any file, tap a key, drop on a petal. Free, private, works offline.">
+<meta property="og:image" content="img/wheel-convert.png">
+<style>
+  :root {
+    --bg: #fbfaf8; --surface: #ffffff; --surface-2: #f3f1ee; --text: #1d1d1f; --muted: #6e6e73;
+    --line: rgba(0,0,0,.09); --brand: #ff5200; --brand-ink: #ffffff; --brand-soft: rgba(255,82,0,.1);
+    --code-bg: #1d1d1f; --code-text: #f5f5f7; --shadow: 0 10px 30px rgba(36,50,61,.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141414; --surface: #1c1c1e; --surface-2: #232325; --text: #f5f5f7; --muted: #a1a1a6;
+      --line: rgba(255,255,255,.1); --brand-soft: rgba(255,82,0,.16); --code-bg: #000; --shadow: 0 10px 30px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 17px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  a { color: var(--brand); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header.top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; color: var(--text); }
+  .brand img { width: 30px; height: 30px; }
+  nav a { color: var(--muted); margin-left: 20px; font-size: 15px; }
+  .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding: 40px 0 56px; }
+  .hero h1 { font-size: clamp(36px, 6vw, 58px); line-height: 1.05; letter-spacing: -.02em; margin: 0 0 16px; }
+  .hero h1 span { color: var(--brand); }
+  .lede { font-size: 20px; color: var(--muted); margin: 0 0 28px; max-width: 34em; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 14px; font-weight: 600;
+         font-size: 17px; border: 1px solid var(--line); background: var(--surface); color: var(--text); }
+  .btn:hover { text-decoration: none; border-color: var(--brand); }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); box-shadow: 0 8px 22px rgba(255,82,0,.3); }
+  .btn.primary:hover { filter: brightness(1.05); }
+  .btn svg { width: 20px; height: 20px; }
+  .meta { margin-top: 16px; font-size: 14px; color: var(--muted); }
+  .meta b { color: var(--text); font-weight: 600; }
+  .hero-art { position: relative; }
+  .hero-art img { width: 100%; max-width: 440px; display: block; margin: 0 auto; border-radius: 28px; box-shadow: var(--shadow); }
+  section { padding: 56px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: clamp(28px, 4vw, 38px); letter-spacing: -.015em; margin: 0 0 10px; }
+  .sub { color: var(--muted); margin: 0 0 30px; max-width: 42em; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
+  .card img { width: 100%; border-radius: 14px; margin-bottom: 14px; }
+  .card h3 { margin: 0 0 6px; font-size: 19px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .key { display: inline-block; min-width: 26px; padding: 1px 7px; border: 1px solid var(--line); border-bottom-width: 2px;
+         border-radius: 7px; background: var(--surface-2); font-size: 14px; font-weight: 600; text-align: center; color: var(--text); }
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+  ol.steps li { counter-increment: s; position: relative; padding: 16px 18px 16px 60px; background: var(--surface);
+                border: 1px solid var(--line); border-radius: 16px; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 18px; top: 15px; width: 28px; height: 28px; border-radius: 50%;
+                        background: var(--brand-soft); color: var(--brand); font-weight: 700; display: grid; place-items: center; font-size: 15px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+  .note { background: var(--brand-soft); border-radius: 16px; padding: 16px 18px; font-size: 15px; }
+  .code { display: flex; align-items: center; gap: 10px; background: var(--code-bg); color: var(--code-text); border-radius: 14px;
+          padding: 14px 14px 14px 18px; font: 14px/1.4 "SF Mono", ui-monospace, Menlo, monospace; overflow-x: auto; }
+  .code code { flex: 1; white-space: nowrap; }
+  .copy { flex: none; border: 0; border-radius: 9px; padding: 7px 12px; background: rgba(255,255,255,.14); color: inherit; font: 600 13px -apple-system, sans-serif; cursor: pointer; }
+  .copy:hover { background: rgba(255,255,255,.24); }
+  .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 28px; margin: 0; padding: 0; list-style: none; }
+  .feats li { padding-left: 26px; position: relative; font-size: 15px; color: var(--muted); }
+  .feats li b { color: var(--text); }
+  .feats li::before { content: ""; position: absolute; left: 0; top: 8px; width: 12px; height: 12px; border-radius: 4px; background: var(--brand); opacity: .85; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; margin-bottom: 10px; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { color: var(--muted); margin: 10px 0 0; font-size: 15px; }
+  footer { padding: 36px 0 60px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  @media (max-width: 820px) {
+    .hero, .two { grid-template-columns: 1fr; }
+    .hero { padding-top: 16px; }
+    .grid3, .feats { grid-template-columns: 1fr; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="./"><img src="img/icon.png" alt="">DropWheel</a>
+    <nav><a href="#install">Install</a><a href="#engines">Engines</a><a href="#faq">FAQ</a></nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <h1>Drag a file. Tap a key.<br><span>Drop on a petal.</span></h1>
+      <p class="lede">DropWheel is a free Mac menu-bar app. While you drag any file, tap a key and a wheel appears at your
+        pointer: convert it, edit it, compress it, AirDrop it. The result is saved beside the original.</p>
+      <div class="cta">
+        <a class="btn primary" id="dl" href="https://github.com/manishvk514/dropwheel-app/releases/latest/download/DropWheel.dmg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          Download for Mac
+        </a>
+        <a class="btn" href="https://github.com/manishvk514/dropwheel-app/releases/latest/download/DropWheel.zip">ZIP</a>
+      </div>
+      <p class="meta"><b>Free</b> · Apple silicon &amp; Intel · macOS 13 Ventura or later · <span id="ver">latest version</span></p>
+    </div>
+    <div class="hero-art"><img src="img/wheel-convert.png" alt="The DropWheel conversion wheel with PNG, WEBP, HEIC and other formats; WEBP is highlighted orange"></div>
+  </div>
+
+  <section>
+    <h2>Three wheels, one gesture</h2>
+    <p class="sub">Start dragging any file from Finder or your desktop, then tap one key. Move onto a petal and let go.
+      <span class="key">Esc</span> cancels.</p>
+    <div class="grid3">
+      <div class="card"><img src="img/wheel-convert.png" alt="Conversion wheel"><h3><span class="key">⇧</span> Shift — Convert</h3>
+        <p>275 conversions between 45 formats: photos, audio, video, PDF, Word, Pages, Markdown, slides, spreadsheets, subtitles and archives.</p></div>
+      <div class="card"><img src="img/wheel-tools.png" alt="Tools wheel"><h3><span class="key">⌘</span> Command — Tools</h3>
+        <p>Compress, metadata, edit, annotate, crop and redact photos; trim, normalize and bleep audio; trim, crop, speed up, split and join video; organize and merge PDFs.</p></div>
+      <div class="card"><img src="img/wheel-actions.png" alt="Actions wheel"><h3><span class="key">⌃</span> Control — Actions</h3>
+        <p>AirDrop, keep it on the Float shelf, copy, move, copy the path, or open the folder in Terminal. Works for folders too.</p></div>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2>Install</h2>
+    <p class="sub">Two ways. Pick one.</p>
+    <div class="two">
+      <div>
+        <h3>A · Download the app</h3>
+        <ol class="steps">
+          <li>Click <b>Download for Mac</b> and open <b>DropWheel.dmg</b>.</li>
+          <li>Drag <b>DropWheel</b> onto the <b>Applications</b> folder in that window.</li>
+          <li>Open DropWheel from Applications. The first time, macOS says it can't check the app for malicious software
+            — click <b>Done</b>.</li>
+          <li>Open <b>System Settings → Privacy &amp; Security</b>, scroll down, and next to “DropWheel was blocked” click
+            <b>Open Anyway</b>, then confirm. You only do this once.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>B · One line in Terminal</h3>
+        <p class="sub" style="margin-bottom:14px">Downloads the latest version, puts it in Applications and opens it — no security
+          prompt. Run it again any time to update.</p>
+        <div class="code"><code id="cmd">curl -fsSL https://manishvk514.github.io/dropwheel-app/install.sh | bash</code>
+          <button class="copy" data-copy="cmd">Copy</button></div>
+        <p class="meta">Open Terminal (⌘ Space, type “Terminal”), paste, press Return. You can <a href="install.sh">read the script</a> first.</p>
+        <div class="note" style="margin-top:18px"><b>Why the warning in option A?</b> DropWheel is free and not sold through
+          the App Store, so it isn't notarized by Apple (that needs a paid developer account). It runs entirely on your Mac
+          and never connects to the internet.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="engines">
+    <h2>Turn on every conversion</h2>
+    <p class="sub">Photos, PDFs and text work straight away. Video, audio, Office files and e-books use free, open-source
+      engines (FFmpeg, Pandoc, LibreOffice, Calibre and friends) that DropWheel installs for you with Homebrew.</p>
+    <ol class="steps">
+      <li>Install Homebrew if you don't have it: follow the one-line instruction on <a href="https://brew.sh">brew.sh</a>.</li>
+      <li>Click DropWheel's icon in the menu bar → <b>Engines…</b> → <b>Install Missing…</b> and wait for it to finish.</li>
+      <li>Optional: for <b>.pages</b> files, get Apple's free <a href="https://apps.apple.com/app/id361309726">Pages</a> app.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Everything included</h2>
+    <ul class="feats">
+      <li><b>Private.</b> No uploads, accounts, ads or tracking. Works offline.</li>
+      <li><b>Never touches originals.</b> Results are new files beside them.</li>
+      <li><b>Batches.</b> Drag many files at once.</li>
+      <li><b>Float shelf.</b> Park files at the screen edge, drag them out later.</li>
+      <li><b>Keyboard.</b> ⌃⌥Space opens the wheel for the Finder selection.</li>
+      <li><b>Your keys.</b> Choose which keys open which wheel in Settings.</li>
+      <li><b>Recent.</b> Your last 10 results, one click from the menu bar.</li>
+      <li><b>QR codes.</b> Drag a photo with a QR code to read it.</li>
+      <li><b>Launch at login.</b> Always there when you need it.</li>
+    </ul>
+  </section>
+
+  <section id="faq">
+    <h2>Questions</h2>
+    <details><summary>Is it really free?</summary><p>Yes. No trial, no limits, no account.</p></details>
+    <details><summary>Which Macs does it run on?</summary><p>Any Mac with Apple silicon (M1 and later) or an Intel processor,
+      running macOS 13 Ventura or later. It's one universal app.</p></details>
+    <details><summary>Where do the converted files go?</summary><p>Next to the original, named like “photo.webp” or “photo
+      Compressed.jpg”. You can choose a fixed folder in Settings instead.</p></details>
+    <details><summary>How do I update?</summary><p>Download the latest DMG and replace the app, or run the one-line installer again.</p></details>
+    <details><summary>How do I uninstall?</summary><p>Quit it from the menu bar icon, then drag DropWheel from Applications
+      to the Bin. To remove its engine helpers too, delete <code>~/Library/Application Support/DropWheel</code>.</p></details>
+  </section>
+
+  <footer>
+    DropWheel · free for personal use · <a href="https://github.com/manishvk514/dropwheel-app/releases">All versions</a>
+  </footer>
+</div>
+<script>
+  // Copy buttons.
+  document.querySelectorAll('.copy').forEach(b => b.addEventListener('click', async () => {
+    const text = document.getElementById(b.dataset.copy).textContent;
+    try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy', 1500); } catch (e) {}
+  }));
+  // Show the latest version number (the download links always point to the latest release).
+  fetch('https://api.github.com/repos/manishvk514/dropwheel-app/releases/latest')
+    .then(r => r.ok ? r.json() : null)
+    .then(j => { if (j && j.tag_name) document.getElementById('ver').textContent = 'version ' + j.tag_name.replace(/^v/, ''); })
+    .catch(() => {});
+</script>
+</body>
+</html>
